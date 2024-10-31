@@ -1,4 +1,4 @@
-package com.example.samplecoroutineslogin.ui.theme
+package com.example.samplecoroutineslogin.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
