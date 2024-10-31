@@ -4,8 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.samplecoroutineslogin.R
-import com.example.samplecoroutineslogin.data.repository.GenericErrorException
-import com.example.samplecoroutineslogin.data.repository.InvalidCredentialsException
+import com.example.samplecoroutineslogin.data.exception.GenericErrorException
+import com.example.samplecoroutineslogin.data.exception.InvalidCredentialsException
 import com.example.samplecoroutineslogin.domain.usecase.DeleteUserNameUseCase
 import com.example.samplecoroutineslogin.domain.usecase.GetUserNameUseCase
 import com.example.samplecoroutineslogin.domain.usecase.LoginUseCase
@@ -37,10 +37,6 @@ class LoginViewModel(
 
     fun sendAction(action: LoginAction.Action) {
         when (action) {
-            is LoginAction.Action.OnBackPressClick -> {
-
-            }
-
             is LoginAction.Action.OnLoginButtonClick -> {
                 handleLogin()
             }
@@ -88,7 +84,7 @@ class LoginViewModel(
                     stopRequestLoading()
                     when (result.exception) {
                         is GenericErrorException -> {
-                            _state.value = LoginState.Error
+                            _state.value = LoginState.Error(getCurrentUiModel())
                         }
 
                         is InvalidCredentialsException -> {

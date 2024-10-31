@@ -25,12 +25,6 @@ class UserPreferencesRepositoryImpl(private val sharedPreferences: SharedPrefere
         }
     }
 
-    override suspend fun hasUserNamePrefs(): Boolean {
-        return withContext(Dispatchers.IO) {
-            sharedPreferences.getString(USERNAME_KEY, "").isNullOrBlank().not()
-        }
-    }
-
     override suspend fun deleteUserName() {
         withContext(Dispatchers.IO) {
             sharedPreferences.edit().remove(USERNAME_KEY).apply()

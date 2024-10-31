@@ -1,5 +1,7 @@
 package com.example.samplecoroutineslogin.data.repository
 
+import com.example.samplecoroutineslogin.data.exception.GenericErrorException
+import com.example.samplecoroutineslogin.data.exception.InvalidCredentialsException
 import com.example.samplecoroutineslogin.domain.repository.LoginRepository
 import com.example.samplecoroutineslogin.helpers.Result
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +32,3 @@ class LoginRepositoryImpl : LoginRepository {
         }
     }
 }
-
-class InvalidCredentialsException : Exception("Invalid credentials")
-class GenericErrorException : Exception("Generic Error")

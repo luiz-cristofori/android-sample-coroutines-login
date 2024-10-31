@@ -283,6 +283,6 @@ fun LoginScreenLoadingPreview() {
 fun LoginScreenErrorPreview() {
     LoginScreen(
         innerPadding = PaddingValues(0.dp),
-        state = LoginState.Error,
+        state = LoginState.Error(uiModel = LoginUiModel()),
     ) {}
 }
