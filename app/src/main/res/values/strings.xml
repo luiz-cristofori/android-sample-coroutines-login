@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Sample Coroutines Login</string>
+    <string name="login_screen_toolbar_text">Login</string>
+    <string name="login_screen_error_text">Something went wrong. Please try again.</string>
+    <string name="login_screen_username_text_field_label">Username</string>
+    <string name="login_screen_password_text_field_label">Password</string>
+    <string name="login_screen_submit_button_label">Login</string>
+    <string name="login_screen_remember_username_text">Remember me</string>
+    <string name="login_screen_request_loading_text">Please wait …</string>
 </resources>
