@@ -3,8 +3,12 @@ package com.example.samplecoroutineslogin.presentation.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.samplecoroutineslogin.R
+import com.example.samplecoroutineslogin.data.repository.GenericErrorException
+import com.example.samplecoroutineslogin.data.repository.InvalidCredentialsException
 import com.example.samplecoroutineslogin.domain.usecase.DeleteUserNameUseCase
 import com.example.samplecoroutineslogin.domain.usecase.GetUserNameUseCase
+import com.example.samplecoroutineslogin.domain.usecase.LoginUseCase
 import com.example.samplecoroutineslogin.domain.usecase.SaveUserNameUseCase
 import com.example.samplecoroutineslogin.helpers.MutableSingleLiveEvent
 import com.example.samplecoroutineslogin.helpers.Result
@@ -15,9 +19,10 @@ import com.example.samplecoroutineslogin.presentation.state.LoginState
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    val getUserNameUseCase: GetUserNameUseCase,
-    val saveUserNameUseCase: SaveUserNameUseCase,
-    val deleteUserNameUseCase: DeleteUserNameUseCase
+    private val loginUseCase: LoginUseCase,
+    private val getUserNameUseCase: GetUserNameUseCase,
+    private val saveUserNameUseCase: SaveUserNameUseCase,
+    private val deleteUserNameUseCase: DeleteUserNameUseCase
 ) : ViewModel() {
 
     private val _state = MutableLiveData<LoginState>(LoginState.Loading)
@@ -37,7 +42,7 @@ class LoginViewModel(
             }
 
             is LoginAction.Action.OnLoginButtonClick -> {
-
+                handleLogin()
             }
 
             is LoginAction.Action.OnPasswordInputChange -> {
@@ -63,7 +68,40 @@ class LoginViewModel(
             }
 
             is LoginAction.Action.OnTryAgainClick -> {
+                _state.value = LoginState.Resume(uiModel = getCurrentUiModel())
+            }
+        }
+    }
 
+    private fun handleLogin() {
+        startRequestLoading()
+        viewModelScope.launch {
+            if (getCurrentUiModel().isRememberLoginChecked) {
+                saveUserNameUseCase(getCurrentUiModel().userNameInputText)
+            }
+            val result = loginUseCase(
+                userName = getCurrentUiModel().userNameInputText,
+                password = getCurrentUiModel().passwordInputText
+            )
+            when (result) {
+                is Result.Error -> {
+                    stopRequestLoading()
+                    when (result.exception) {
+                        is GenericErrorException -> {
+                            _state.value = LoginState.Error
+                        }
+
+                        is InvalidCredentialsException -> {
+                            _effect.value =
+                                LoginUiEffect.DisplaySnackBarError(R.string.login_screen_login_error_text)
+                        }
+                    }
+                }
+
+                is Result.Success -> {
+                    stopRequestLoading()
+                    _effect.value = LoginUiEffect.DisplaySnackBarSuccess
+                }
             }
         }
     }
@@ -88,7 +126,8 @@ class LoginViewModel(
         viewModelScope.launch {
             when (val result = getUserNameUseCase()) {
                 is Result.Error -> {
-
+                    _effect.value =
+                        LoginUiEffect.DisplaySnackBarError(R.string.login_screen_generic_error_text)
                 }
 
                 is Result.Success -> {
@@ -102,6 +141,24 @@ class LoginViewModel(
                 }
             }
         }
+    }
+
+    private fun startRequestLoading() {
+        _state.value =
+            LoginState.Resume(
+                uiModel = getCurrentUiModel().copy(
+                    isRequestInProgress = true
+                )
+            )
+    }
+
+    private fun stopRequestLoading() {
+        _state.value =
+            LoginState.Resume(
+                uiModel = getCurrentUiModel().copy(
+                    isRequestInProgress = false
+                )
+            )
     }
 
     private fun getCurrentUiModel() = checkNotNull(_state.value?.uiModel)

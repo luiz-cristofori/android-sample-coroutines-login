@@ -1,4 +1,4 @@
-package com.example.samplecoroutineslogin.presentation
+package com.example.samplecoroutineslogin.presentation.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -81,60 +81,83 @@ fun LoginContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        TextField(
-            value = uiModel.userNameInputText,
-            onValueChange = {
-                sendAction(LoginAction.Action.OnUserNameInputChange(it))
-            },
-            label = {
-                Text(stringResource(R.string.login_screen_username_text_field_label))
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
-        )
+        UsernameFieldSection(uiModel.userNameInputText, sendAction)
         Spacer(modifier = Modifier.size(4.dp))
-        TextField(
-            value = uiModel.passwordInputText,
-            onValueChange = {
-                sendAction(LoginAction.Action.OnPasswordInputChange(it))
-            },
-            label = {
-                Text(stringResource(R.string.login_screen_password_text_field_label))
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
-        )
+        PasswordFieldSection(uiModel.passwordInputText, sendAction)
         Spacer(modifier = Modifier.size(4.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp)
-        ) {
-            Checkbox(
-                checked = uiModel.isRememberLoginChecked,
-                onCheckedChange = {
-                    sendAction(LoginAction.Action.OnRememberUserNameChecked(!uiModel.isRememberLoginChecked))
-                }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(R.string.login_screen_remember_username_text))
-        }
+        RememberMeSection(uiModel.isRememberLoginChecked, sendAction)
         Spacer(modifier = Modifier.size(4.dp))
         Button(
             modifier = Modifier.width(150.dp),
-            onClick = {}
+            enabled = uiModel.passwordInputText.isNotBlank() && uiModel.userNameInputText.isNotBlank(),
+            onClick = {
+                sendAction(
+                    LoginAction.Action.OnLoginButtonClick(
+                        uiModel.userNameInputText,
+                        uiModel.passwordInputText
+                    )
+                )
+            }
         ) {
             Text(stringResource(R.string.login_screen_submit_button_label))
         }
     }
+}
+
+@Composable
+fun RememberMeSection(rememberLoginChecked: Boolean, sendAction: (LoginAction.Action) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+    ) {
+        Checkbox(
+            checked = rememberLoginChecked,
+            onCheckedChange = {
+                sendAction(LoginAction.Action.OnRememberUserNameChecked(!rememberLoginChecked))
+            }
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(stringResource(R.string.login_screen_remember_username_text))
+    }
+}
+
+@Composable
+fun PasswordFieldSection(passwordInputText: String, sendAction: (LoginAction.Action) -> Unit) {
+    TextField(
+        value = passwordInputText,
+        onValueChange = {
+            sendAction(LoginAction.Action.OnPasswordInputChange(it))
+        },
+        label = {
+            Text(stringResource(R.string.login_screen_password_text_field_label))
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        singleLine = true,
+        visualTransformation = PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+    )
+}
+
+@Composable
+fun UsernameFieldSection(userNameInputText: String, sendAction: (LoginAction.Action) -> Unit) {
+    TextField(
+        value = userNameInputText,
+        onValueChange = {
+            sendAction(LoginAction.Action.OnUserNameInputChange(it))
+        },
+        label = {
+            Text(stringResource(R.string.login_screen_username_text_field_label))
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+    )
 }
 
 @Composable
@@ -159,7 +182,6 @@ fun LoadingDialog(
                             .size(48.dp)
                             .padding(bottom = 16.dp)
                     )
-
                     Text(
                         text = stringResource(R.string.login_screen_request_loading_text),
                         style = MaterialTheme.typography.bodyMedium,
