@@ -1,4 +1,4 @@
-package com.example.samplecoroutineslogin.presentation.viewmodel
+package com.example.samplecoroutineslogin.helpers
 
 import android.util.Log
 import androidx.annotation.MainThread

@@ -21,10 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.samplecoroutineslogin.R
+import com.example.samplecoroutineslogin.helpers.collectEffect
 import com.example.samplecoroutineslogin.presentation.effect.LoginUiEffect
 import com.example.samplecoroutineslogin.presentation.theme.MainTheme
 import com.example.samplecoroutineslogin.presentation.viewmodel.LoginViewModel
-import com.example.samplecoroutineslogin.presentation.viewmodel.collectEffect
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
